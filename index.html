@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Francis Ngaile - Personal Portfolio</title>
+    <link href="https://unpkg.com/tailwindcss@^2/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #efe6e6; /* Light gray background - fallback */
+            background-image: url('uploaded:image_d54939.png-c30004da-f588-48d5-8ac1-730b3eb4e9ec'); /* New page background image */
+            background-repeat: repeat; /* Allows the image to tile */
+            background-size: auto; /* Maintains original size, or adjust to 'contain'/'cover' if preferred */
+        }
+        .header-bg {
+            /* Faded samurai background photo */
+            background-image: linear-gradient(rgba(255, 255, 255, 0.858), rgba(228, 5, 5, 0.826)), url('Japanesewallpaper.jpg'); /* Dark overlay for fading */
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-color: #6405a4; /* Fallback solid color if image fails to load */
+            border-bottom-left-radius: 50px;
+            border-bottom-right-radius: 50px;
+        }
+        .section-bg {
+            background-color: rgb(243, 232, 232);
+            border-radius: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .project-card {
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            transition: transform 0.2s;
+            /* Ensure the image takes up more space relative to the text */
+            display: flex;
+            flex-direction: column; /* Default to column for small screens */
+            align-items: center; /* Center items for column layout */
+            padding: 1.5rem; /* Increased padding for more space within the card */
+        }
+        .project-card:hover {
+            transform: translateY(-5px);
+        }
+        /* Responsive adjustments for project cards on larger screens */
+        @media (min-width: 640px) { /* sm breakpoint */
+            .project-card {
+                flex-direction: row; /* Switch to row layout */
+                align-items: flex-start; /* Align items to the start for row layout */
+            }
+        }
+
+        .project-card img {
+            width: 150px; /* Increased base width for images */
+            height: 150px; /* Increased base height for images */
+            margin-bottom: 1rem; /* Space below image in column layout */
+        }
+        @media (min-width: 640px) { /* sm breakpoint */
+            .project-card img {
+                width: 180px; /* Even larger on small-medium screens */
+                height: 180px;
+                margin-bottom: 0; /* No bottom margin in row layout */
+                margin-right: 1.5rem; /* Space to the right of image in row layout */
+            }
+        }
+        @media (min-width: 768px) { /* md breakpoint */
+            .project-card img {
+                width: 200px; /* Larger on medium screens */
+                height: 200px;
+            }
+        }
+
+        .btn-primary {
+            background-color: #FFC107; /* Yellow */
+            color: black;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-weight: 600;
+            transition: background-color 0.2s;
+        }
+        .btn-primary:hover {
+            background-color: #e0a800; /* Darker yellow */
+        }
+        .btn-secondary {
+            background-color: transparent;
+            border: 2px solid #FFC107;
+            color: #FFC107;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-weight: 600;
+            transition: background-color 0.2s, color 0.2s;
+        }
+        .btn-secondary:hover {
+            background-color: #FFC107;
+            color: black;
+        }
+        .social-icon {
+            font-size: 24px;
+            color: #333;
+            transition: color 0.2s;
+        }
+        .social-icon:hover {
+            color: #FFC107;
+        }
+        input[type="text"], input[type="email"], textarea {
+            border-radius: 10px;
+            border: 1px solid #e2e8f0;
+            padding: 12px;
+            width: 100%;
+            font-size: 16px;
+        }
+        input[type="text"]:focus, input[type="email"]:focus, textarea:focus {
+            outline: none;
+            border-color: #FFC107;
+            box-shadow: 0 0 0 2px rgba(255, 193, 7, 0.2);
+        }
+
+        /* Styles for the catalogue section (initially hidden) */
+        .catalogue-section {
+            display: none; /* Hidden by default */
+        }
+
+        /* Catalogue item styling for hover effect */
+        .catalogue-item {
+            cursor: pointer;
+            transition: transform 0.3s ease-in-out;
+            border-radius: 8px; /* Ensure rounded corners */
+            overflow: hidden; /* Hide overflow when scaling */
+        }
+        .catalogue-item:hover {
+            transform: scale(1.05);
+        }
+
+        /* Fullscreen lightbox styles */
+        .lightbox-overlay {
+            display: none; /* Hidden by default */
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        .lightbox-content {
+            max-width: 90%;
+            max-height: 90%;
+            object-fit: contain;
+        }
+        .lightbox-close {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            color: #fff;
+            font-size: 40px;
+            cursor: pointer;
+            z-index: 1001;
+        }
+
+        /* Decagon clip-path for hero image */
+        .decagon-clip {
+            clip-path: polygon(50% 0%, 81% 9%, 100% 35%, 100% 65%, 81% 91%, 50% 100%, 19% 91%, 0% 65%, 0% 35%, 19% 9%);
+            transition: transform 0.3s ease-in-out;
+        }
+    </style>
+</head>
+<body class="leading-normal tracking-normal text-gray-800">
+
+    <!-- Navbar -->
+    <nav class="relative container mx-auto p-6 flex justify-between items-center">
+        <div class="text-2xl font-bold text-gray-800">Madelyn Torff</div>
+        <div class="hidden md:flex space-x-6">
+            <a href="#about" class="hover:text-yellow-600">About</a>
+            <a href="#projects" class="hover:text-yellow-600">Projects</a>
+            <a href="#contact" class="hover:text-yellow-600">Contact</a>
+        </div>
+        <!-- Hamburger Icon -->
+        <button id="menu-btn" class="block hamburger md:hidden focus:outline-none">
+            <span class="hamburger-top"></span>
+            <span class="hamburger-middle"></span>
+            <span class="hamburger-bottom"></span>
+        </button>
+    </nav>
+
+    <!-- Mobile Menu -->
+    <div id="mobile-menu" class="absolute hidden flex flex-col items-center self-end py-8 mt-10 space-y-6 font-bold bg-white sm:w-auto sm:self-center left-6 right-6 drop-shadow-md z-10 rounded-lg">
+        <a href="#about" class="hover:text-yellow-600">About</a>
+        <a href="#projects" class="hover:text-yellow-600">Projects</a>
+        <a href="#contact" class="hover:text-yellow-600">Contact</a>
+    </div>
+
+    <!-- Main Content Wrapper (to hide/show for catalogue) -->
+    <div id="main-content">
+        <!-- Hero Section -->
+        <section id="hero" class="header-bg py-16 md:py-24 px-4">
+            <div class="container mx-auto flex flex-col md:flex-row items-center md:justify-between max-w-6xl">
+                <div class="text-center md:text-left mb-10 md:mb-0 md:w-1/2">
+                    <span class="text-white text-sm font-semibold uppercase mb-2 block">Mechanical Design Engineer</span>
+                    <h1 class="text-4xl md:text-6xl font-extrabold leading-tight mb-4 text-white">
+                        Hello, I am <br class="hidden md:block">Francis Ngaile Kassuki
+                    </h1>
+                    <p class="text-lg md:text-xl mb-8 text-gray-200">
+                        Mechanical Engineer : Design Engineer : Automation & Manufacturing Engineer
+                    </p>
+                    <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
+                        <a href="#projects" class="btn-primary inline-block text-center">Projects</a>
+                        <a href="#contact" class="btn-secondary inline-block text-center">LinkedIn</a>
+                    </div>
+                </div>
+                <div class="md:w-3/5 flex justify-center items-center relative">
+                    <img src="PassportPhoto.JPG" alt="Madelyn Torff" class="w-full max-w-md shadow-lg decagon-clip">
+                    <!-- Add some abstract shapes or blobs for the background effect like in the image -->
+                    <div class="absolute w-40 h-40 bg-white rounded-full opacity-20 -top-10 -left-10"></div>
+                    <div class="absolute w-60 h-60 bg-white rounded-full opacity-10 bottom-0 right-0"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- About Me Section -->
+        <section id="about" class="py-16 md:py-24 px-4 bg-gray-100">
+            <div class="container mx-auto max-w-6xl">
+                <div class="section-bg p-8 md:p-12 flex flex-col md:flex-row items-center md:justify-between">
+                    <div class="md:w-1/2 text-center md:text-left mb-8 md:mb-0">
+                        <h2 class="text-3xl md:text-4xl font-bold mb-4">About me</h2>
+                        <p class="text-gray-700 text-lg mb-6">
+                            I have specialized in mechanical design using tools like SolidWorks, AutoCAD, Fusion 360, Keyshot & Revit and with a strong understanding of DFM principles, FEA, and BOM management. Whether it's developing efficient systems, simplifying manufacturing or Building Information Modeling (BIM), I enjoy solving complex problems and making designs that are both innovative and practical.
+                        </p>
+                        <a href="#contact" class="btn-primary inline-block">Resume</a>
+                    </div>
+                    <div class="md:w-1/2 flex justify-center">
+                        <img src="Rockingchair.png" alt="About Francis" class="w-full max-w-sm rounded-full shadow-lg">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Projects Section -->
+        <section id="projects" class="py-16 md:py-24 px-4">
+            <div class="container mx-auto max-w-6xl">
+                <h2 class="text-3xl md:text-4xl font-bold text-center mb-12">Projects</h2>
+
+                <!-- Modified grid layout for larger cards -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <!-- Project Card 1 -->
+                    <div class="project-card">
+                        <img src="Rockingchair.png" alt="Project 1" class="rounded-lg object-cover">
+                        <div class="text-center sm:text-left flex-grow">
+                            <h3 class="text-xl font-bold mb-2">Rocking Chair</h3>
+                            <p class="text-gray-600 text-sm mb-4">
+                                Comfortable, Fancy, Minimalistic.
+                            </p>
+                            <button class="btn-secondary text-sm inline-block view-project-btn">View Project</button>
+                        </div>
+                    </div>
+
+                    <!-- Project Card 2 -->
+                    <div class="project-card">
+                        <img src="https://placehold.co/300x200/E0E0E0/333333?text=Project+2" alt="Project 2" class="rounded-lg object-cover">
+                        <div class="text-center sm:text-left flex-grow">
+                            <h3 class="text-xl font-bold mb-2">Project Name 2</h3>
+                            <p class="text-gray-600 text-sm mb-4">
+                                Explore Project 2, focusing on the technologies used and its impact.
+                            </p>
+                            <button class="btn-secondary text-sm inline-block view-project-btn">View Project</button>
+                        </div>
+                    </div>
+
+                    <!-- Project Card 3 -->
+                    <div class="project-card">
+                        <img src="https://placehold.co/300x200/E0E0E0/333333?text=Project+3" alt="Project 3" class="rounded-lg object-cover">
+                        <div class="text-center sm:text-left flex-grow">
+                            <h3 class="text-xl font-bold mb-2">Project Name 3</h3>
+                            <p class="text-gray-600 text-sm mb-4">
+                                Details about Project 3, including challenges overcome and solutions implemented.
+                            </p>
+                            <button class="btn-secondary text-sm inline-block view-project-btn">View Project</button>
+                        </div>
+                    </div>
+
+                    <!-- Project Card 4 -->
+                    <div class="project-card">
+                        <img src="https://placehold.co/300x200/E0E0E0/333333?text=Project+4" alt="Project 4" class="rounded-lg object-cover">
+                        <div class="text-center sm:text-left flex-grow">
+                            <h3 class="text-xl font-bold mb-2">Project Name 4</h3>
+                            <p class="text-gray-600 text-sm mb-4">
+                                An overview of Project 4, highlighting its user interface and experience.
+                            </p>
+                            <button class="btn-secondary text-sm inline-block view-project-btn">View Project</button>
+                        </div>
+                    </div>
+
+                    <!-- Project Card 5 -->
+                    <div class="project-card">
+                        <img src="https://placehold.co/300x200/E0E0E0/333333?text=Project+5" alt="Project 5" class="rounded-lg object-cover">
+                        <div class="text-center sm:text-left flex-grow">
+                            <h3 class="text-xl font-bold mb-2">Project Name 5</h3>
+                            <p class="text-gray-600 text-sm mb-4">
+                                Discover Project 5, a case study in innovative design and development.
+                            </p>
+                            <button class="btn-secondary text-sm inline-block view-project-btn">View Project</button>
+                        </div>
+                    </div>
+
+                    <!-- Project Card 6 -->
+                    <div class="project-card">
+                        <img src="https://placehold.co/300x200/E0E0E0/333333?text=Project+6" alt="Project 6" class="rounded-lg object-cover">
+                        <div class="text-center sm:text-left flex-grow">
+                            <h3 class="text-xl font-bold mb-2">Project Name 6</h3>
+                            <p class="text-gray-600 text-sm mb-4">
+                                Project 6 showcases effective problem-solving and a clean architecture.
+                            </p>
+                            <button class="btn-secondary text-sm inline-block view-project-btn">View Project</button>
+                        </div>
+                    </div>
+
+                    <!-- Project Card 7 -->
+                    <div class="project-card">
+                        <img src="https://placehold.co/300x200/E0E0E0/333333?text=Project+7" alt="Project 7" class="rounded-lg object-cover">
+                        <div class="text-center sm:text-left flex-grow">
+                            <h3 class="text-xl font-bold mb-2">Project Name 7</h3>
+                            <p class="text-gray-600 text-sm mb-4">
+                                Learn about Project 7, its impact on user engagement and performance.
+                            </p>
+                            <button class="btn-secondary text-sm inline-block view-project-btn">View Project</button>
+                        </div>
+                    </div>
+
+                    <!-- Project Card 8 -->
+                    <div class="project-card">
+                        <img src="https://placehold.co/300x200/E0E0E0/333333?text=Project+8" alt="Project 8" class="rounded-lg object-cover">
+                        <div class="text-center sm:text-left flex-grow">
+                            <h3 class="text-xl font-bold mb-2">Project Name 8</h3>
+                            <p class="text-gray-600 text-sm mb-4">
+                                Project 8 exemplifies a robust backend combined with a sleek frontend.
+                            </p>
+                            <button class="btn-secondary text-sm inline-block view-project-btn">View Project</button>
+                        </div>
+                    </div>
+
+                    <!-- Project Card 9 -->
+                    <div class="project-card">
+                        <img src="https://placehold.co/300x200/E0E0E0/333333?text=Project+9" alt="Project 9" class="rounded-lg object-cover">
+                        <div class="text-center sm:text-left flex-grow">
+                            <h3 class="text-xl font-bold mb-2">Project Name 9</h3>
+                            <p class="text-gray-600 text-sm mb-4">
+                                Dive into Project 9, a collaborative effort leading to a successful launch.
+                            </p>
+                            <button class="btn-secondary text-sm inline-block view-project-btn">View Project</button>
+                        </div>
+                    </div>
+
+                    <!-- Project Card 10 -->
+                    <div class="project-card">
+                        <img src="https://placehold.co/300x200/E0E0E0/333333?text=Project+10" alt="Project 10" class="rounded-lg object-cover">
+                        <div class="text-center sm:text-left flex-grow">
+                            <h3 class="text-xl font-bold mb-2">Project Name 10</h3>
+                            <p class="text-gray-600 text-sm mb-4">
+                                The final showcase, Project 10, demonstrating advanced functionalities.
+                            </p>
+                            <button class="btn-secondary text-sm inline-block view-project-btn">View Project</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact Section -->
+        <section id="contact" class="py-16 md:py-24 px-4 bg-gray-100">
+            <div class="container mx-auto max-w-2xl">
+                <h2 class="text-3xl md:text-4xl font-bold text-center mb-12">Contact</h2>
+                <div class="section-bg p-8 md:p-12">
+                    <!-- Modified form for mailto functionality -->
+                    <form action="mailto:franzngaile@gmail.com" method="post" enctype="text/plain" class="space-y-6">
+                        <div>
+                            <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Name</label>
+                            <input type="text" id="name" name="Name" class="w-full" placeholder="Your Name">
+                        </div>
+                        <div>
+                            <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                            <input type="email" id="email" name="Email" class="w-full" placeholder="your@example.com">
+                        </div>
+                        <div>
+                            <label for="message" class="block text-sm font-medium text-gray-700 mb-1">Message</label>
+                            <textarea id="message" name="Message" rows="5" class="w-full" placeholder="Your message..."></textarea>
+                        </div>
+                        <div class="text-right">
+                            <button type="submit" class="btn-primary">Send Message</button>
+                        </div>
+                    </form>
+
+                    <div class="flex justify-center space-x-6 mt-10">
+                        <a href="#" class="social-icon"><i class="fab fa-linkedin"></i></a>
+                        <a href="#" class="social-icon"><i class="fab fa-github"></i></a>
+                        <a href="#" class="social-icon"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="social-icon"><i class="fab fa-instagram"></i></a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div> <!-- End of main-content -->
+
+    <!-- Project Catalogue Section (Initially Hidden) -->
+    <section id="project-catalogue" class="catalogue-section py-16 md:py-24 px-4 bg-gray-100">
+        <div class="container mx-auto max-w-6xl section-bg p-8 md:p-12">
+            <button id="back-to-projects-btn" class="btn-secondary mb-8">&larr; Back to Projects</button>
+            <h2 class="text-3xl md:text-4xl font-bold text-center mb-12">Project Catalogue</h2>
+
+            <h3 class="text-2xl font-bold mb-6">Photos</h3>
+            <!-- Modified grid for photos: now 1 column on small, 2 on medium, 2 on large for larger images -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4 mb-12">
+                <!-- Placeholder Photos - Added catalogue-item class and cursor-pointer -->
+                <img src="https://placehold.co/600x450/FFC107/FFFFFF?text=Photo+1" alt="Catalogue Photo 1" class="w-full h-auto rounded-lg shadow-md object-cover catalogue-item">
+                <img src="https://placehold.co/600x450/FFC107/FFFFFF?text=Photo+2" alt="Catalogue Photo 2" class="w-full h-auto rounded-lg shadow-md object-cover catalogue-item">
+                <img src="https://placehold.co/600x450/FFC107/FFFFFF?text=Photo+3" alt="Catalogue Photo 3" class="w-full h-auto rounded-lg shadow-md object-cover catalogue-item">
+                <img src="https://placehold.co/600x450/FFC107/FFFFFF?text=Photo+4" alt="Catalogue Photo 4" class="w-full h-auto rounded-lg shadow-md object-cover catalogue-item">
+                <img src="https://placehold.co/600x450/FFC107/FFFFFF?text=Photo+5" alt="Catalogue Photo 5" class="w-full h-auto rounded-lg shadow-md object-cover catalogue-item">
+                <img src="https://placehold.co/600x450/FFC107/FFFFFF?text=Photo+6" alt="Catalogue Photo 6" class="w-full h-auto rounded-lg shadow-md object-cover catalogue-item">
+            </div>
+
+            <h3 class="text-2xl font-bold mb-6">Videos</h3>
+            <!-- Modified grid for videos: now 1 column on small, 1 on medium, 1 on large for larger videos -->
+            <div class="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-1 gap-4">
+                <!-- Placeholder Videos -->
+                <div class="w-full catalogue-item">
+                    <video controls class="w-full rounded-lg shadow-md">
+                        <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                    <p class="text-center text-gray-700 mt-2">Sample Video 1 (Big Buck Bunny)</p>
+                </div>
+                <div class="w-full catalogue-item">
+                    <video controls class="w-full rounded-lg shadow-md">
+                        <source src="https://www.w3schools.com/html/movie.mp4" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                    <p class="text-center text-gray-700 mt-2">Sample Video 2 (Movie Clip)</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Fullscreen Lightbox Overlay -->
+    <div id="lightbox-overlay" class="lightbox-overlay">
+        <span id="lightbox-close" class="lightbox-close">&times;</span>
+        <img id="lightbox-image" src="" alt="Full Screen Image" class="lightbox-content">
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-8 text-center">
+        <div class="container mx-auto flex flex-col md:flex-row justify-center items-center space-y-2 md:space-y-0 md:space-x-4">
+            <p>&copy; 2025 Francis Ngaile Kassuki. All rights reserved.</p>
+            <p>
+                <a href="tel:+254714199689" class="hover:text-yellow-400">Phone: +254 714 199689</a>
+            </p>
+            <p>
+                <a href="mailto:franzngaile@gmail.com" class="hover:text-yellow-400">Email: franzngaile@gmail.com</a>
+            </p>
+        </div>
+    </footer>
+
+    <!-- FontAwesome for Social Icons -->
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+
+    <script>
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+
+                // Close mobile menu if open
+                if (mobileMenu.classList.contains('flex')) {
+                    mobileMenu.classList.remove('flex');
+                    mobileMenu.classList.add('hidden');
+                    menuBtn.classList.remove('open');
+                }
+            });
+        });
+
+        // Mobile menu functionality
+        const menuBtn = document.getElementById('menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+
+        menuBtn.addEventListener('click', () => {
+            menuBtn.classList.toggle('open');
+            mobileMenu.classList.toggle('hidden');
+            mobileMenu.classList.toggle('flex');
+        });
+
+        // Project Catalogue Functionality
+        const mainContent = document.getElementById('main-content');
+        const projectCatalogue = document.getElementById('project-catalogue');
+        const viewProjectButtons = document.querySelectorAll('.view-project-btn');
+        const backToProjectsBtn = document.getElementById('back-to-projects-btn');
+
+        // Lightbox elements
+        const lightboxOverlay = document.getElementById('lightbox-overlay');
+        const lightboxImage = document.getElementById('lightbox-image');
+        const lightboxClose = document.getElementById('lightbox-close');
+        const catalogueImages = document.querySelectorAll('.catalogue-section img'); // Select all images in the catalogue
+
+        // Function to show the catalogue and hide main content
+        function showCatalogue() {
+            mainContent.style.display = 'none';
+            projectCatalogue.style.display = 'block';
+            window.scrollTo({ top: 0, behavior: 'smooth' }); // Scroll to top of page
+        }
+
+        // Function to hide the catalogue and show main content
+        function hideCatalogue() {
+            projectCatalogue.style.display = 'none';
+            mainContent.style.display = 'block';
+            window.scrollTo({ top: 0, behavior: 'smooth' }); // Scroll to top of page
+        }
+
+        // Add event listeners to all "View Project" buttons
+        viewProjectButtons.forEach(button => {
+            button.addEventListener('click', showCatalogue);
+        });
+
+        // Add event listener to "Back to Projects" button
+        backToProjectsBtn.addEventListener('click', hideCatalogue);
+
+        // Lightbox functionality
+        catalogueImages.forEach(image => {
+            image.addEventListener('click', () => {
+                lightboxImage.src = image.src; // Set the source of the lightbox image
+                lightboxOverlay.style.display = 'flex'; // Show the lightbox
+            });
+        });
+
+        lightboxClose.addEventListener('click', () => {
+            lightboxOverlay.style.display = 'none'; // Hide the lightbox
+        });
+
+        lightboxOverlay.addEventListener('click', (e) => {
+            // Hide lightbox if clicking outside the image (on the overlay itself)
+            if (e.target === lightboxOverlay) {
+                lightboxOverlay.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>
